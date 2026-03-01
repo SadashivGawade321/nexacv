@@ -1,0 +1,1156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>NexaCV — Sign In</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet"/>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --primary: #7c3aed;
+      --primary-dark: #5b21b6;
+      --accent: #06b6d4;
+      --success: #10b981;
+      --danger: #ef4444;
+      --glass-bg: rgba(255,255,255,0.05);
+      --glass-border: rgba(124,58,237,0.2);
+      --text: #f1f5f9;
+      --text-muted: #7a9ab8;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #060c18;
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      overflow-x: hidden;
+      overflow-y: auto;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* ─── Three.js Canvas ─── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+    }
+
+    /* ─── Gradient overlay ─── */
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 20% 50%, rgba(124,58,237,0.2) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 20%, rgba(6,182,212,0.12) 0%, transparent 50%),
+                  radial-gradient(ellipse at 50% 100%, rgba(245,158,11,0.06) 0%, transparent 40%);
+      z-index: 1;
+      pointer-events: none;
+    }
+
+    /* ─── Layout ─── */
+    .page {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 80px;
+      width: 100%;
+      max-width: 1100px;
+      padding: 20px;
+    }
+
+    /* ─── Brand side ─── */
+    .brand-side {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      max-width: 420px;
+    }
+
+    .logo {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+    }
+
+    .logo-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 15px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 0 30px rgba(124,58,237,0.6);
+      flex-shrink: 0;
+    }
+
+    .logo-text {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 800;
+      background: linear-gradient(135deg, #e2e8f0 20%, var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      line-height: 1.1;
+    }
+
+    .logo-sub {
+      font-size: 11px;
+      color: var(--text-muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+      -webkit-text-fill-color: var(--text-muted);
+    }
+
+    .brand-heading {
+      font-size: 42px;
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    .brand-heading span {
+      background: linear-gradient(135deg, var(--primary), var(--accent));
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .brand-sub {
+      font-size: 16px;
+      color: var(--text-muted);
+      line-height: 1.7;
+    }
+
+    .features {
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      margin-top: 8px;
+    }
+
+    .feature-item {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 14px;
+      color: var(--text-muted);
+    }
+
+    .feature-icon {
+      width: 34px;
+      height: 34px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: rgba(124,58,237,0.12);
+      border: 1px solid rgba(124,58,237,0.25);
+    }
+
+    /* ─── Card ─── */
+    .card {
+      flex-shrink: 0;
+      width: 420px;
+      background: rgba(13,21,37,0.85);
+      border: 1px solid rgba(124,58,237,0.25);
+      border-radius: 24px;
+      padding: 40px;
+      backdrop-filter: blur(32px);
+      -webkit-backdrop-filter: blur(32px);
+      box-shadow: 0 32px 80px rgba(0,0,0,0.7), 0 0 0 1px rgba(124,58,237,0.1), inset 0 1px 0 rgba(255,255,255,0.06);
+      animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes slideIn {
+      from { opacity: 0; transform: translateY(30px) scale(0.97); }
+      to   { opacity: 1; transform: translateY(0)   scale(1);    }
+    }
+
+    /* ─── Tabs ─── */
+    .tabs {
+      display: flex;
+      background: rgba(0,0,0,0.3);
+      border-radius: 12px;
+      padding: 4px;
+      margin-bottom: 32px;
+    }
+
+    .tab-btn {
+      flex: 1;
+      padding: 10px;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      font-size: 14px;
+      font-weight: 600;
+      border-radius: 9px;
+      cursor: pointer;
+      transition: all 0.25s;
+    }
+
+    .tab-btn.active {
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      color: #fff;
+      box-shadow: 0 4px 16px rgba(124,58,237,0.5);
+    }
+
+    /* ─── Form ─── */
+    .form-title {
+      font-size: 22px;
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .form-sub {
+      font-size: 13px;
+      color: var(--text-muted);
+      margin-bottom: 28px;
+    }
+
+    .form-group {
+      margin-bottom: 18px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 13px;
+      font-weight: 500;
+      color: var(--text-muted);
+      margin-bottom: 8px;
+    }
+
+    .input-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .input-wrap .icon {
+      position: absolute;
+      left: 14px;
+      font-size: 16px;
+      pointer-events: none;
+      opacity: 0.6;
+    }
+
+    .input-wrap input {
+      width: 100%;
+      padding: 13px 14px 13px 42px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      font-family: inherit;
+      outline: none;
+      transition: border-color 0.25s, box-shadow 0.25s;
+    }
+
+    .input-wrap input::placeholder { color: rgba(255,255,255,0.3); }
+
+    .input-wrap input:focus {
+      border-color: var(--primary);
+      box-shadow: 0 0 0 3px rgba(124,58,237,0.22);
+      background: rgba(124,58,237,0.06);
+    }
+
+    .eye-btn {
+      position: absolute;
+      right: 14px;
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      cursor: pointer;
+      font-size: 16px;
+      padding: 0;
+    }
+
+    .form-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 22px;
+    }
+
+    .remember {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      font-size: 13px;
+      color: var(--text-muted);
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .remember input[type="checkbox"] {
+      accent-color: var(--primary);
+      width: 15px;
+      height: 15px;
+    }
+
+    .forgot-link {
+      font-size: 13px;
+      color: var(--primary);
+      text-decoration: none;
+      transition: opacity 0.2s;
+    }
+
+    .forgot-link:hover { opacity: 0.7; }
+
+    /* ─── Submit button ─── */
+    .btn-primary {
+      width: 100%;
+      padding: 14px;
+      background: linear-gradient(135deg, var(--primary), #9333ea);
+      border: none;
+      border-radius: 12px;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      font-family: inherit;
+      cursor: pointer;
+      transition: transform 0.2s, box-shadow 0.2s, filter 0.2s;
+      box-shadow: 0 8px 28px rgba(124,58,237,0.5);
+      position: relative;
+      overflow: hidden;
+    }
+
+    .btn-primary::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.12), transparent);
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 12px 36px rgba(124,58,237,0.6);
+      filter: brightness(1.08);
+    }
+
+    .btn-primary:active { transform: translateY(0); }
+
+    .btn-primary.loading .btn-text { opacity: 0; }
+    .btn-primary.loading::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='10' stroke='white' stroke-width='2' fill='none' stroke-dasharray='60' stroke-dashoffset='60'%3E%3CanimateTransform attributeName='transform' type='rotate' from='0 12 12' to='360 12 12' dur='0.8s' repeatCount='indefinite'/%3E%3C/circle%3E%3C/svg%3E") center/24px no-repeat;
+    }
+
+    /* ─── Divider ─── */
+    .divider {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0;
+      color: var(--text-muted);
+      font-size: 12px;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: rgba(255,255,255,0.1);
+    }
+
+    /* ─── Google button ─── */
+    .btn-google {
+      width: 100%;
+      padding: 13px;
+      background: rgba(255,255,255,0.06);
+      border: 1px solid rgba(255,255,255,0.12);
+      border-radius: 12px;
+      color: #fff;
+      font-size: 14px;
+      font-weight: 500;
+      font-family: inherit;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: background 0.2s, transform 0.2s;
+    }
+
+    .btn-google:hover {
+      background: rgba(255,255,255,0.1);
+      transform: translateY(-1px);
+    }
+
+    /* ─── Error/Success messages ─── */
+    .message {
+      padding: 11px 14px;
+      border-radius: 10px;
+      font-size: 13px;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    .message.error {
+      background: rgba(239,68,68,0.15);
+      border: 1px solid rgba(239,68,68,0.3);
+      color: #fca5a5;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .message.success {
+      background: rgba(16,185,129,0.15);
+      border: 1px solid rgba(16,185,129,0.3);
+      color: #6ee7b7;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    /* ─── Strength bar ─── */
+    .strength-wrap { margin-top: 8px; }
+    .strength-bar {
+      height: 4px;
+      background: rgba(255,255,255,0.1);
+      border-radius: 4px;
+      overflow: hidden;
+    }
+    .strength-fill {
+      height: 100%;
+      border-radius: 4px;
+      transition: width 0.3s, background 0.3s;
+      width: 0%;
+    }
+    .strength-label { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+    /* ─── Mobile ─── */
+    @media (max-width: 860px) {
+      .page { gap: 40px; }
+      .brand-heading { font-size: 34px; }
+    }
+
+    @media (max-width: 700px) {
+      body { align-items: flex-start; padding: 24px 0 40px; }
+      .page {
+        flex-direction: column;
+        align-items: center;
+        padding: 20px 16px;
+        gap: 32px;
+      }
+      .brand-side {
+        display: flex;
+        max-width: 100%;
+        width: 100%;
+        align-items: center;
+        text-align: center;
+      }
+      .brand-side .logo { justify-content: center; }
+      .brand-heading { font-size: 28px; text-align: center; }
+      .brand-sub { font-size: 14px; text-align: center; }
+      .features { align-items: flex-start; }
+      .feature-item { font-size: 13px; }
+      .card { width: 100%; max-width: 100%; padding: 28px 20px; border-radius: 18px; }
+      .tabs { margin-bottom: 24px; }
+      .form-title { font-size: 20px; }
+      .form-sub { font-size: 12px; margin-bottom: 22px; }
+      .form-row { flex-direction: column; align-items: flex-start; gap: 10px; margin-bottom: 18px; }
+    }
+
+    @media (max-width: 420px) {
+      .brand-heading { font-size: 24px; }
+      .brand-sub { display: none; }
+      .features { display: none; }
+      .logo-text { font-size: 22px; }
+      .card { padding: 24px 16px; }
+      .btn-primary { font-size: 14px; padding: 12px; }
+    }
+
+    /* ═══════════════════════════════════
+       SPLASH SCREEN
+    ═══════════════════════════════════ */
+    #splash {
+      position: fixed; inset: 0; z-index: 99999;
+      background: #060c18;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center; gap: 0;
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    #splash.hide {
+      opacity: 0;
+      pointer-events: none;
+      transform: scale(1.04);
+    }
+
+    /* aurora rings behind logo */
+    .splash-aura {
+      position: absolute;
+      width: 340px; height: 340px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(124,58,237,.22) 0%, transparent 70%);
+      animation: splash-pulse 2s ease-in-out infinite;
+    }
+    .splash-aura2 {
+      position: absolute;
+      width: 200px; height: 200px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(6,182,212,.18) 0%, transparent 65%);
+      animation: splash-pulse 2s ease-in-out infinite reverse;
+    }
+    @keyframes splash-pulse {
+      0%,100% { transform: scale(1);   opacity: .6; }
+      50%      { transform: scale(1.18); opacity: 1;  }
+    }
+
+    /* logo pop-in */
+    .splash-logo {
+      position: relative; z-index: 2;
+      animation: splash-popin .7s cubic-bezier(.16,1,.3,1) forwards;
+      opacity: 0; transform: scale(.5);
+    }
+    @keyframes splash-popin {
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    /* brand name */
+    .splash-name {
+      position: relative; z-index: 2;
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 42px; font-weight: 800; letter-spacing: -1px;
+      background: linear-gradient(135deg, #e2e8f0 30%, #06b6d4);
+      -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+      margin-top: 18px;
+      animation: splash-fadeslide .6s .3s cubic-bezier(.16,1,.3,1) forwards;
+      opacity: 0; transform: translateY(14px);
+    }
+    .splash-tag {
+      position: relative; z-index: 2;
+      font-size: 11px; letter-spacing: 3px; text-transform: uppercase;
+      color: #4a6585; margin-top: 6px;
+      animation: splash-fadeslide .6s .5s cubic-bezier(.16,1,.3,1) forwards;
+      opacity: 0; transform: translateY(10px);
+    }
+    @keyframes splash-fadeslide {
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* tagline */
+    .splash-tagline {
+      position: relative; z-index: 2;
+      font-size: 15px; color: #7a9ab8; margin-top: 14px; text-align: center;
+      max-width: 300px; line-height: 1.6;
+      animation: splash-fadeslide .6s .7s cubic-bezier(.16,1,.3,1) forwards;
+      opacity: 0; transform: translateY(10px);
+    }
+
+    /* progress bar */
+    .splash-bar-wrap {
+      position: relative; z-index: 2;
+      width: 180px; height: 3px; background: rgba(255,255,255,.08);
+      border-radius: 3px; margin-top: 40px; overflow: hidden;
+    }
+    .splash-bar {
+      height: 100%; width: 0%;
+      background: linear-gradient(90deg, #7c3aed, #06b6d4);
+      border-radius: 3px;
+      animation: splash-fill 2.6s .2s cubic-bezier(.4,0,.2,1) forwards;
+    }
+    @keyframes splash-fill { to { width: 100%; } }
+
+    /* floating dots */
+    .splash-dot {
+      position: absolute; border-radius: 50%;
+      animation: splash-float linear infinite;
+      opacity: 0;
+    }
+    @keyframes splash-float {
+      0%   { transform: translateY(0)   scale(1);   opacity: 0; }
+      10%  { opacity: .7; }
+      90%  { opacity: .4; }
+      100% { transform: translateY(-80px) scale(.5); opacity: 0; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══════════ SPLASH SCREEN ══════════ -->
+<div id="splash">
+  <!-- Glow rings -->
+  <div class="splash-aura"></div>
+  <div class="splash-aura2"></div>
+
+  <!-- Floating particles (JS will add more) -->
+
+  <!-- Logo -->
+  <div class="splash-logo">
+    <svg width="72" height="72" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="sp1" x1="0" y1="0" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#7c3aed"/>
+          <stop offset="0.5" stop-color="#9333ea"/>
+          <stop offset="1" stop-color="#06b6d4"/>
+        </linearGradient>
+        <linearGradient id="sp1b" x1="0" y1="0" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#f0abfc" stop-opacity="0.9"/>
+          <stop offset="1" stop-color="#a5f3fc" stop-opacity="0.9"/>
+        </linearGradient>
+        <filter id="sp-glow">
+          <feGaussianBlur stdDeviation="2.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+      <rect width="52" height="52" rx="15" fill="url(#sp1)" filter="url(#sp-glow)"/>
+      <rect x="13" y="13" width="26" height="4.5" rx="2.25" fill="url(#sp1b)"/>
+      <rect x="13" y="21" width="18" height="3.5" rx="1.75" fill="white" opacity="0.65"/>
+      <rect x="13" y="29" width="22" height="3.5" rx="1.75" fill="white" opacity="0.65"/>
+      <rect x="13" y="37" width="14" height="3" rx="1.5" fill="white" opacity="0.4"/>
+      <circle cx="41" cy="11" r="6" fill="#f59e0b"/>
+      <circle cx="41" cy="11" r="3.5" fill="#fde68a"/>
+    </svg>
+  </div>
+
+  <div class="splash-name">NexaCV</div>
+  <div class="splash-tag">AI Resume Builder</div>
+  <div class="splash-tagline">Craft resumes that get you hired — powered by AI</div>
+
+  <!-- Progress bar -->
+  <div class="splash-bar-wrap">
+    <div class="splash-bar"></div>
+  </div>
+</div>
+
+<script>
+(function() {
+  // Spawn floating particles
+  const splash = document.getElementById('splash');
+  const colors = ['#7c3aed','#9333ea','#06b6d4','#a78bfa','#f59e0b'];
+  for (let i = 0; i < 18; i++) {
+    const d = document.createElement('div');
+    d.className = 'splash-dot';
+    const size = Math.random() * 5 + 3;
+    d.style.cssText = [
+      `width:${size}px`, `height:${size}px`,
+      `background:${colors[Math.floor(Math.random()*colors.length)]}`,
+      `left:${Math.random()*100}%`,
+      `top:${40 + Math.random()*55}%`,
+      `animation-duration:${2 + Math.random()*3}s`,
+      `animation-delay:${Math.random()*2}s`
+    ].join(';');
+    splash.appendChild(d);
+  }
+
+  // Hide splash after 3 seconds
+  setTimeout(() => {
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 750);
+  }, 3000);
+})();
+</script>
+
+<canvas id="bg-canvas"></canvas>
+<div class="overlay"></div>
+
+<div class="page">
+
+  <!-- Brand Side -->
+  <div class="brand-side">
+    <div class="logo">
+      <div class="logo-icon">
+        <svg width="52" height="52" viewBox="0 0 52 52" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <defs>
+            <linearGradient id="ng2" x1="0" y1="0" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#7c3aed"/>
+              <stop offset="0.5" stop-color="#9333ea"/>
+              <stop offset="1" stop-color="#06b6d4"/>
+            </linearGradient>
+            <linearGradient id="ng2b" x1="0" y1="0" x2="52" y2="52" gradientUnits="userSpaceOnUse">
+              <stop stop-color="#f0abfc" stop-opacity="0.9"/>
+              <stop offset="1" stop-color="#a5f3fc" stop-opacity="0.9"/>
+            </linearGradient>
+          </defs>
+          <rect width="52" height="52" rx="15" fill="url(#ng2)"/>
+          <rect x="13" y="13" width="26" height="4.5" rx="2.25" fill="url(#ng2b)"/>
+          <rect x="13" y="21" width="18" height="3.5" rx="1.75" fill="white" opacity="0.6"/>
+          <rect x="13" y="29" width="22" height="3.5" rx="1.75" fill="white" opacity="0.6"/>
+          <rect x="13" y="37" width="14" height="3" rx="1.5" fill="white" opacity="0.4"/>
+          <circle cx="41" cy="11" r="6" fill="#f59e0b"/>
+          <circle cx="41" cy="11" r="3.5" fill="#fde68a"/>
+        </svg>
+      </div>
+      <div>
+        <div class="logo-text">NexaCV</div>
+        <div class="logo-sub">AI Resume Builder</div>
+      </div>
+    </div>
+    <div class="brand-heading">Craft Resumes<br>That Get You <span>Hired</span></div>
+    <div class="brand-sub">
+      Create ATS-optimized resumes with AI-powered suggestions,
+      real-time scoring, and beautiful templates — all in one place.
+    </div>
+    <div class="features">
+      <div class="feature-item">
+        <div class="feature-icon">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#a78bfa" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+        </div>
+        AI-powered resume suggestions &amp; improvements
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon" style="background:rgba(6,182,212,.12);border-color:rgba(6,182,212,.25)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#67e8f9" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        </div>
+        Real-time ATS score against job descriptions
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon" style="background:rgba(16,185,129,.12);border-color:rgba(16,185,129,.25)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#6ee7b7" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+        </div>
+        Professional templates with one-click export
+      </div>
+      <div class="feature-item">
+        <div class="feature-icon" style="background:rgba(245,158,11,.12);border-color:rgba(245,158,11,.25)">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fcd34d" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        </div>
+        Built &amp; downloaded in under 5 minutes
+      </div>
+    </div>
+  </div>
+
+  <!-- Auth Card -->
+  <div class="card">
+    <div class="tabs">
+      <button class="tab-btn active" onclick="switchTab('login')">Sign In</button>
+      <button class="tab-btn" onclick="switchTab('register')">Sign Up</button>
+    </div>
+
+    <!-- MESSAGE -->
+    <div class="message" id="msg"></div>
+
+    <!-- LOGIN FORM -->
+    <div id="login-form">
+      <div class="form-title">Welcome back 👋</div>
+      <div class="form-sub">Sign in to your ResumeAI account</div>
+
+      <div class="form-group">
+        <label>Email address</label>
+        <div class="input-wrap">
+          <span class="icon">✉️</span>
+          <input type="email" id="login-email" placeholder="you@example.com" autocomplete="email"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <span class="icon">🔒</span>
+          <input type="password" id="login-password" placeholder="Enter your password" autocomplete="current-password"/>
+          <button class="eye-btn" onclick="togglePass('login-password', this)">👁️</button>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <label class="remember">
+          <input type="checkbox" id="remember"/> Remember me
+        </label>
+        <a href="#" class="forgot-link">Forgot password?</a>
+      </div>
+
+      <button class="btn-primary" id="login-btn" onclick="handleLogin()">
+        <span class="btn-text">Sign In →</span>
+      </button>
+
+      <div class="divider">or continue with</div>
+
+      <button class="btn-google" onclick="googleAuth()">
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.5 30.2 0 24 0 14.8 0 6.9 5.4 3 13.3l7.8 6C12.7 13 17.9 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.9-2.2 5.4-4.7 7l7.3 5.7c4.3-4 6.8-9.8 6.8-16.7z"/>
+          <path fill="#FBBC05" d="M10.8 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7L2.5 13.3A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.5 10.7l8.3-6z"/>
+          <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.3-5.7c-2.2 1.5-5 2.3-8.6 2.3-6.1 0-11.3-3.5-13.2-9.1l-8.3 6C6.9 42.6 14.8 48 24 48z"/>
+        </svg>
+        Continue with Google
+      </button>
+    </div>
+
+    <!-- REGISTER FORM -->
+    <div id="register-form" style="display:none">
+      <div class="form-title">Create account</div>
+      <div class="form-sub">Join thousands getting hired with ResumeAI</div>
+
+      <div class="form-group">
+        <label>Full name</label>
+        <div class="input-wrap">
+          <span class="icon">👤</span>
+          <input type="text" id="reg-name" placeholder="John Doe" autocomplete="name"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Email address</label>
+        <div class="input-wrap">
+          <span class="icon">✉️</span>
+          <input type="email" id="reg-email" placeholder="you@example.com" autocomplete="email"/>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Password</label>
+        <div class="input-wrap">
+          <span class="icon">🔒</span>
+          <input type="password" id="reg-password" placeholder="Create a strong password" oninput="checkStrength(this.value)"/>
+          <button class="eye-btn" onclick="togglePass('reg-password', this)">👁️</button>
+        </div>
+        <div class="strength-wrap">
+          <div class="strength-bar"><div class="strength-fill" id="strength-fill"></div></div>
+          <div class="strength-label" id="strength-label">Enter a password</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Confirm password</label>
+        <div class="input-wrap">
+          <span class="icon">🔒</span>
+          <input type="password" id="reg-confirm" placeholder="Repeat your password"/>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="register-btn" onclick="handleRegister()" style="margin-top:6px">
+        <span class="btn-text">Create Account →</span>
+      </button>
+
+      <div class="divider">or continue with</div>
+
+      <button class="btn-google" onclick="googleAuth()">
+        <svg width="18" height="18" viewBox="0 0 48 48">
+          <path fill="#EA4335" d="M24 9.5c3.5 0 6.6 1.2 9 3.2l6.7-6.7C35.7 2.5 30.2 0 24 0 14.8 0 6.9 5.4 3 13.3l7.8 6C12.7 13 17.9 9.5 24 9.5z"/>
+          <path fill="#4285F4" d="M46.5 24.5c0-1.6-.1-3.1-.4-4.5H24v8.5h12.7c-.5 2.9-2.2 5.4-4.7 7l7.3 5.7c4.3-4 6.8-9.8 6.8-16.7z"/>
+          <path fill="#FBBC05" d="M10.8 28.7A14.5 14.5 0 0 1 9.5 24c0-1.6.3-3.2.8-4.7L2.5 13.3A23.9 23.9 0 0 0 0 24c0 3.9.9 7.5 2.5 10.7l8.3-6z"/>
+          <path fill="#34A853" d="M24 48c6.5 0 11.9-2.1 15.9-5.8l-7.3-5.7c-2.2 1.5-5 2.3-8.6 2.3-6.1 0-11.3-3.5-13.2-9.1l-8.3 6C6.9 42.6 14.8 48 24 48z"/>
+        </svg>
+        Continue with Google
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Three.js CDN -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+
+<script>
+// ═══════════════════════════════════════════════
+//  THREE.JS — Animated 3D Scene
+// ═══════════════════════════════════════════════
+(function () {
+  const canvas = document.getElementById('bg-canvas');
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 200);
+  camera.position.set(0, 0, 14);
+
+  // ── Lighting ──
+  scene.add(new THREE.AmbientLight(0xffffff, 0.3));
+  const pointLight1 = new THREE.PointLight(0x6c63ff, 4, 40);
+  pointLight1.position.set(8, 8, 8);
+  scene.add(pointLight1);
+  const pointLight2 = new THREE.PointLight(0x00d4ff, 3, 40);
+  pointLight2.position.set(-8, -4, 6);
+  scene.add(pointLight2);
+
+  // ── Central 3D Document model ──
+  const docGroup = new THREE.Group();
+
+  // Document body
+  const bodyGeo = new THREE.BoxGeometry(3.2, 4.2, 0.12, 2, 2);
+  const bodyMat = new THREE.MeshPhongMaterial({
+    color: 0x1a1d3a,
+    emissive: 0x0d0f1f,
+    specular: 0x6c63ff,
+    shininess: 80,
+    transparent: true,
+    opacity: 0.95,
+  });
+  const body = new THREE.Mesh(bodyGeo, bodyMat);
+  docGroup.add(body);
+
+  // Document border glow
+  const borderGeo = new THREE.BoxGeometry(3.3, 4.3, 0.08);
+  const borderMat = new THREE.MeshBasicMaterial({
+    color: 0x6c63ff,
+    transparent: true,
+    opacity: 0.35,
+    wireframe: false,
+  });
+  const border = new THREE.Mesh(borderGeo, borderMat);
+  border.position.z = -0.04;
+  docGroup.add(border);
+
+  // Lines on the document (text lines)
+  const lineMat = new THREE.MeshBasicMaterial({ color: 0x6c63ff, transparent: true, opacity: 0.5 });
+  const lines = [
+    { y: 1.3, w: 2.0, h: 0.10 },
+    { y: 0.8, w: 2.4, h: 0.06 },
+    { y: 0.55, w: 1.8, h: 0.06 },
+    { y: 0.15, w: 2.4, h: 0.06 },
+    { y: -0.1, w: 2.0, h: 0.06 },
+    { y: -0.35, w: 1.6, h: 0.06 },
+    { y: -0.75, w: 2.4, h: 0.06 },
+    { y: -1.0, w: 2.2, h: 0.06 },
+    { y: -1.25, w: 1.9, h: 0.06 },
+    { y: -1.6,  w: 2.4, h: 0.04 },
+  ];
+  lines.forEach(l => {
+    const geo = new THREE.PlaneGeometry(l.w, l.h);
+    const mesh = new THREE.Mesh(geo, lineMat.clone());
+    mesh.position.set(0, l.y, 0.07);
+    docGroup.add(mesh);
+  });
+
+  // Accent header line
+  const headerMat = new THREE.MeshBasicMaterial({ color: 0x00d4ff, transparent: true, opacity: 0.8 });
+  const headerLine = new THREE.Mesh(new THREE.PlaneGeometry(2.8, 0.14), headerMat);
+  headerLine.position.set(0, 1.6, 0.07);
+  docGroup.add(headerLine);
+
+  docGroup.position.set(3.5, 0, 0);
+  scene.add(docGroup);
+
+  // ── Floating orbs ──
+  const orbs = [];
+  const orbData = [
+    { r: 0.45, color: 0x6c63ff, pos: [-6, 3, -2] },
+    { r: 0.3,  color: 0x00d4ff, pos: [7, -2, -3] },
+    { r: 0.55, color: 0x9333ea, pos: [-5, -3, -1] },
+    { r: 0.22, color: 0x00d4ff, pos: [5, 4, -4]  },
+    { r: 0.35, color: 0x6c63ff, pos: [-2, -5, -2] },
+  ];
+  orbData.forEach(d => {
+    const mat = new THREE.MeshBasicMaterial({ color: d.color, transparent: true, opacity: 0.6 });
+    const mesh = new THREE.Mesh(new THREE.SphereGeometry(d.r, 16, 16), mat);
+    mesh.position.set(...d.pos);
+    scene.add(mesh);
+    orbs.push({ mesh, basePos: [...d.pos], speed: 0.4 + Math.random() * 0.6 });
+  });
+
+  // ── Particle field ──
+  const particleCount = 260;
+  const positions = new Float32Array(particleCount * 3);
+  for (let i = 0; i < particleCount; i++) {
+    positions[i * 3]     = (Math.random() - 0.5) * 40;
+    positions[i * 3 + 1] = (Math.random() - 0.5) * 30;
+    positions[i * 3 + 2] = (Math.random() - 0.5) * 20 - 5;
+  }
+  const pGeo = new THREE.BufferGeometry();
+  pGeo.setAttribute('position', new THREE.BufferAttribute(positions, 3));
+  const pMat = new THREE.PointsMaterial({ color: 0x6c63ff, size: 0.08, transparent: true, opacity: 0.55 });
+  scene.add(new THREE.Points(pGeo, pMat));
+
+  // ── Wireframe torus ──
+  const torusMat = new THREE.MeshBasicMaterial({ color: 0x6c63ff, wireframe: true, transparent: true, opacity: 0.12 });
+  const torus = new THREE.Mesh(new THREE.TorusGeometry(5, 1.5, 12, 36), torusMat);
+  torus.position.set(-4, 0, -6);
+  scene.add(torus);
+
+  // ── Icosahedron ──
+  const icoMat = new THREE.MeshPhongMaterial({ color: 0x00d4ff, emissive: 0x003355, wireframe: false, transparent: true, opacity: 0.22 });
+  const ico = new THREE.Mesh(new THREE.IcosahedronGeometry(1.4, 0), icoMat);
+  ico.position.set(-5, 2, -2);
+  scene.add(ico);
+
+  // ── Mouse tracking ──
+  let mouse = { x: 0, y: 0 };
+  document.addEventListener('mousemove', e => {
+    mouse.x = (e.clientX / window.innerWidth - 0.5) * 2;
+    mouse.y = -(e.clientY / window.innerHeight - 0.5) * 2;
+  });
+
+  // ── Resize ──
+  window.addEventListener('resize', () => {
+    camera.aspect = window.innerWidth / window.innerHeight;
+    camera.updateProjectionMatrix();
+    renderer.setSize(window.innerWidth, window.innerHeight);
+  });
+
+  // ── Animate ──
+  const clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    const t = clock.getElapsedTime();
+
+    // Rotate doc
+    docGroup.rotation.y = Math.sin(t * 0.35) * 0.25 + mouse.x * 0.08;
+    docGroup.rotation.x = Math.sin(t * 0.2) * 0.1 + mouse.y * 0.05;
+    docGroup.position.y = Math.sin(t * 0.5) * 0.3;
+
+    // Glow pulse
+    border.material.opacity = 0.2 + Math.sin(t * 1.5) * 0.15;
+
+    // Orbs float
+    orbs.forEach((o, i) => {
+      o.mesh.position.y = o.basePos[1] + Math.sin(t * o.speed + i) * 0.6;
+      o.mesh.position.x = o.basePos[0] + Math.cos(t * o.speed * 0.7 + i) * 0.3;
+    });
+
+    // Torus spin
+    torus.rotation.x += 0.003;
+    torus.rotation.z += 0.002;
+
+    // Ico spin
+    ico.rotation.y += 0.007;
+    ico.rotation.x += 0.004;
+
+    // Camera subtle follow mouse
+    camera.position.x += (mouse.x * 0.5 - camera.position.x) * 0.04;
+    camera.position.y += (mouse.y * 0.3 - camera.position.y) * 0.04;
+    camera.lookAt(scene.position);
+
+    renderer.render(scene, camera);
+  }
+  animate();
+})();
+
+// ═══════════════════════════════════════════════
+//  UI Logic
+// ═══════════════════════════════════════════════
+const API = '/api';
+
+function switchTab(tab) {
+  const isLogin = tab === 'login';
+  document.getElementById('login-form').style.display    = isLogin ? 'block' : 'none';
+  document.getElementById('register-form').style.display = isLogin ? 'none'  : 'block';
+  document.querySelectorAll('.tab-btn').forEach((b, i) => {
+    b.classList.toggle('active', (i === 0) === isLogin);
+  });
+  hideMsg();
+}
+
+function togglePass(id, btn) {
+  const inp = document.getElementById(id);
+  if (inp.type === 'password') { inp.type = 'text'; btn.textContent = '🙈'; }
+  else                          { inp.type = 'password'; btn.textContent = '👁️'; }
+}
+
+function showMsg(type, text) {
+  const el = document.getElementById('msg');
+  el.className = `message ${type}`;
+  el.innerHTML = (type === 'error' ? '⚠️ ' : '✅ ') + text;
+  el.style.display = 'flex';
+}
+
+function hideMsg() { document.getElementById('msg').style.display = 'none'; }
+
+function checkStrength(pw) {
+  let score = 0;
+  if (pw.length >= 8)             score++;
+  if (/[A-Z]/.test(pw))           score++;
+  if (/[0-9]/.test(pw))           score++;
+  if (/[^a-zA-Z0-9]/.test(pw))   score++;
+
+  const fill   = document.getElementById('strength-fill');
+  const label  = document.getElementById('strength-label');
+  const levels = [
+    { w: '0%',   color: 'transparent',        text: 'Enter a password' },
+    { w: '25%',  color: '#ef4444',             text: 'Weak'   },
+    { w: '50%',  color: '#f59e0b',             text: 'Fair'   },
+    { w: '75%',  color: '#3b82f6',             text: 'Good'   },
+    { w: '100%', color: '#10b981',             text: 'Strong ✓' },
+  ];
+  const lvl = levels[Math.min(score, 4)];
+  fill.style.width      = pw ? lvl.w : '0%';
+  fill.style.background = lvl.color;
+  label.textContent     = pw ? lvl.text : 'Enter a password';
+}
+
+async function handleLogin() {
+  const email    = document.getElementById('login-email').value.trim();
+  const password = document.getElementById('login-password').value;
+  hideMsg();
+
+  if (!email || !password) { showMsg('error', 'Please fill in all fields.'); return; }
+
+  const btn = document.getElementById('login-btn');
+  btn.classList.add('loading');
+
+  try {
+    const res = await fetch(`${API}/auth/login`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      const detail = data.detail;
+      const msg = Array.isArray(detail)
+        ? detail.map(e => e.msg || JSON.stringify(e)).join(', ')
+        : (typeof detail === 'string' ? detail : 'Login failed');
+      throw new Error(msg);
+    }
+
+    localStorage.setItem('token', data.access_token);
+    localStorage.setItem('user',  JSON.stringify(data.user));
+    showMsg('success', 'Login successful! Redirecting...');
+    setTimeout(() => { window.location.href = '/app/index.html'; }, 1200);
+  } catch (err) {
+    showMsg('error', err.message);
+  } finally {
+    btn.classList.remove('loading');
+  }
+}
+
+async function handleRegister() {
+  const name     = document.getElementById('reg-name').value.trim();
+  const email    = document.getElementById('reg-email').value.trim();
+  const password = document.getElementById('reg-password').value;
+  const confirm  = document.getElementById('reg-confirm').value;
+  hideMsg();
+
+  if (!name || !email || !password || !confirm) { showMsg('error', 'Please fill in all fields.'); return; }
+  if (password !== confirm) { showMsg('error', 'Passwords do not match.'); return; }
+  if (password.length < 6)  { showMsg('error', 'Password must be at least 6 characters.'); return; }
+
+  const btn = document.getElementById('register-btn');
+  btn.classList.add('loading');
+
+  try {
+    const res = await fetch(`${API}/auth/register`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ full_name: name, email, password }),
+    });
+    const data = await res.json();
+    if (!res.ok) {
+      const detail = data.detail;
+      const msg = Array.isArray(detail)
+        ? detail.map(e => e.msg || JSON.stringify(e)).join(', ')
+        : (typeof detail === 'string' ? detail : 'Registration failed');
+      throw new Error(msg);
+    }
+
+    showMsg('success', 'Account created! Please sign in.');
+    setTimeout(() => switchTab('login'), 1500);
+  } catch (err) {
+    showMsg('error', err.message);
+  } finally {
+    btn.classList.remove('loading');
+  }
+}
+
+function googleAuth() {
+  showMsg('error', 'Google OAuth coming soon! Use email login for now.');
+}
+
+// Keyboard enter
+document.addEventListener('keydown', e => {
+  if (e.key !== 'Enter') return;
+  const loginVisible = document.getElementById('login-form').style.display !== 'none';
+  if (loginVisible) handleLogin(); else handleRegister();
+});
+</script>
+</body>
+</html>

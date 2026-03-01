@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8"/>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: 'Times New Roman', Georgia, serif; background: #fff; color: #111; padding: 48px; max-width: 820px; margin: 0 auto; }
+  .header { text-align: center; border-bottom: 2px solid #111; padding-bottom: 16px; margin-bottom: 20px; }
+  .header h1 { font-size: 28px; letter-spacing: 2px; text-transform: uppercase; }
+  .contact-line { font-size: 12px; color: #444; margin-top: 8px; }
+  .contact-line span { margin: 0 8px; }
+  .section { margin-bottom: 20px; }
+  .section-title { font-size: 13px; font-weight: 700; letter-spacing: 2px; text-transform: uppercase; border-bottom: 1px solid #111; padding-bottom: 4px; margin-bottom: 12px; }
+  .entry { margin-bottom: 14px; }
+  .entry-header { display: flex; justify-content: space-between; }
+  .entry-title { font-size: 14px; font-weight: 700; }
+  .entry-subtitle { font-size: 13px; font-style: italic; color: #444; }
+  .entry-date { font-size: 12px; }
+  .entry-desc { font-size: 13px; color: #333; margin-top: 5px; line-height: 1.6; }
+  ul.bullets { margin-top: 5px; padding-left: 18px; }
+  ul.bullets li { font-size: 13px; margin-bottom: 3px; line-height: 1.5; }
+  .skills-grid { display: flex; flex-wrap: wrap; gap: 6px; }
+  .skill-tag { font-size: 12px; border: 1px solid #999; padding: 2px 10px; border-radius: 2px; }
+  .summary { font-size: 13px; line-height: 1.7; color: #333; font-style: italic; }
+  .cert-item { font-size: 13px; margin-bottom: 5px; }
+</style>
+</head>
+<body>
+  <div class="header">
+    <h1>{{ r.full_name }}</h1>
+    <div class="contact-line">
+      {% if r.email %}<span>{{ r.email }}</span>{% endif %}
+      {% if r.phone %}<span>| {{ r.phone }}</span>{% endif %}
+      {% if r.location %}<span>| {{ r.location }}</span>{% endif %}
+      {% if r.linkedin %}<span>| {{ r.linkedin }}</span>{% endif %}
+      {% if r.github %}<span>| {{ r.github }}</span>{% endif %}
+    </div>
+  </div>
+
+  {% if r.summary %}
+  <div class="section">
+    <div class="section-title">Summary</div>
+    <div class="summary">{{ r.summary }}</div>
+  </div>
+  {% endif %}
+
+  {% if r.experience %}
+  <div class="section">
+    <div class="section-title">Experience</div>
+    {% for exp in r.experience %}
+    <div class="entry">
+      <div class="entry-header">
+        <div>
+          <div class="entry-title">{{ exp.position }}</div>
+          <div class="entry-subtitle">{{ exp.company }}, {{ exp.location }}</div>
+        </div>
+        <div class="entry-date">{{ exp.start_date }} – {{ 'Present' if exp.is_current else exp.end_date }}</div>
+      </div>
+      <div class="entry-desc">{{ exp.description }}</div>
+      {% if exp.achievements %}<ul class="bullets">{% for a in exp.achievements %}<li>{{ a }}</li>{% endfor %}</ul>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if r.education %}
+  <div class="section">
+    <div class="section-title">Education</div>
+    {% for edu in r.education %}
+    <div class="entry">
+      <div class="entry-header">
+        <div>
+          <div class="entry-title">{{ edu.degree }} in {{ edu.field_of_study }}</div>
+          <div class="entry-subtitle">{{ edu.institution }}</div>
+        </div>
+        <div class="entry-date">{{ edu.start_date }} – {{ edu.end_date }}</div>
+      </div>
+      {% if edu.gpa %}<div class="entry-desc">GPA: {{ edu.gpa }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if r.skills %}
+  <div class="section">
+    <div class="section-title">Skills</div>
+    <div class="skills-grid">{% for s in r.skills %}<span class="skill-tag">{{ s }}</span>{% endfor %}</div>
+  </div>
+  {% endif %}
+
+  {% if r.projects %}
+  <div class="section">
+    <div class="section-title">Projects</div>
+    {% for proj in r.projects %}
+    <div class="entry">
+      <div class="entry-title">{{ proj.name }}</div>
+      <div class="entry-desc">{{ proj.description }}</div>
+      {% if proj.technologies %}<div class="entry-desc"><em>Technologies:</em> {{ proj.technologies|join(', ') }}</div>{% endif %}
+    </div>
+    {% endfor %}
+  </div>
+  {% endif %}
+
+  {% if r.certifications %}
+  <div class="section">
+    <div class="section-title">Certifications</div>
+    {% for cert in r.certifications %}
+    <div class="cert-item"><strong>{{ cert.name }}</strong> — {{ cert.issuer }}, {{ cert.date }}</div>
+    {% endfor %}
+  </div>
+  {% endif %}
+</body>
+</html>

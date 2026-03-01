@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NexaCV — Choose Template</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Space+Grotesk:wght@600;700;800&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --primary:#7c3aed;--primary-light:#a78bfa;--accent:#06b6d4;
+  --bg:#060c18;--surface:#0d1525;--surface2:#111e33;--border:#1a2d45;--border2:#24406a;
+  --text:#f1f5f9;--text2:#7a9ab8;
+}
+body{font-family:'Inter',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;position:relative}
+body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 60% 50% at 10% 0%,rgba(124,58,237,.12) 0%,transparent 55%),radial-gradient(ellipse 50% 40% at 90% 90%,rgba(6,182,212,.08) 0%,transparent 50%);pointer-events:none;z-index:0}
+
+/* ── Topbar ── */
+.topbar{display:flex;align-items:center;justify-content:space-between;padding:0 32px;height:62px;background:rgba(13,21,37,.85);backdrop-filter:blur(24px);-webkit-backdrop-filter:blur(24px);border-bottom:1px solid rgba(124,58,237,.18);position:sticky;top:0;z-index:50;box-shadow:0 2px 32px rgba(0,0,0,.5)}
+.logo{display:flex;align-items:center;gap:10px;text-decoration:none}
+.logo-wordmark{display:flex;flex-direction:column;line-height:1}
+.logo-wordmark .logo-name{font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;background:linear-gradient(135deg,#e2e8f0 20%,var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent;letter-spacing:-.3px}
+.logo-wordmark .logo-tag{font-size:9px;font-weight:500;color:#4a6585;letter-spacing:1.5px;text-transform:uppercase;-webkit-text-fill-color:#4a6585}
+.btn{padding:9px 18px;border-radius:9px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .2s;border:none}
+.btn-primary{background:linear-gradient(135deg,var(--primary),#9333ea);color:#fff;box-shadow:0 4px 18px rgba(124,58,237,.4)}
+.btn-primary:hover{filter:brightness(1.1);transform:translateY(-1px)}
+.btn-outline{background:transparent;border:1px solid var(--border2);color:var(--text2)}
+.btn-outline:hover{border-color:var(--primary-light);color:var(--primary-light)}
+
+/* ── Hero ── */
+.hero{padding:56px 32px 40px;text-align:center;max-width:700px;margin:0 auto;position:relative;z-index:1}
+.hero h1{font-family:'Space Grotesk',sans-serif;font-size:40px;font-weight:800;line-height:1.15;margin-bottom:12px}
+.hero h1 span{background:linear-gradient(135deg,var(--primary),var(--accent));-webkit-background-clip:text;-webkit-text-fill-color:transparent}
+.hero p{font-size:15px;color:var(--text2);line-height:1.7}
+
+/* ── Filter tabs ── */
+.filter-bar{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;padding:0 32px 32px}
+.filter-btn{padding:7px 18px;border-radius:999px;font-size:13px;font-weight:500;cursor:pointer;border:1px solid var(--border2);background:transparent;color:var(--text2);font-family:inherit;transition:all .2s}
+.filter-btn:hover{border-color:var(--primary-light);color:var(--primary-light)}
+.filter-btn.active{background:linear-gradient(135deg,var(--primary),#9333ea);border-color:transparent;color:#fff;box-shadow:0 4px 14px rgba(124,58,237,.35)}
+
+/* ── Grid ── */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:24px;padding:0 32px 60px;max-width:1300px;margin:0 auto;position:relative;z-index:1}
+
+/* ── Template Card ── */
+.tpl-card{background:rgba(13,21,37,.9);border:2px solid var(--border2);border-radius:18px;overflow:hidden;cursor:pointer;transition:all .3s;position:relative;backdrop-filter:blur(8px)}
+.tpl-card:hover{border-color:var(--primary);transform:translateY(-5px);box-shadow:0 24px 60px rgba(124,58,237,.25)}
+.tpl-card.selected{border-color:var(--primary);box-shadow:0 0 0 4px rgba(124,58,237,.25)}
+.selected-badge{position:absolute;top:12px;right:12px;background:linear-gradient(135deg,var(--primary),#9333ea);color:#fff;font-size:11px;font-weight:700;padding:4px 12px;border-radius:999px;display:none;z-index:5;box-shadow:0 4px 12px rgba(124,58,237,.4)}
+.tpl-card.selected .selected-badge{display:block}
+
+/* ── Preview thumbnail ── */
+.tpl-preview{height:300px;overflow:hidden;position:relative;border-bottom:1px solid var(--border);background:#fff}
+.tpl-preview iframe{width:200%;height:200%;transform:scale(0.5);transform-origin:top left;pointer-events:none;border:none}
+.tpl-preview .preview-overlay{position:absolute;inset:0;background:transparent;z-index:2}
+
+/* ── Fallback preview (CSS-drawn mini resume) ── */
+.mini-resume{width:100%;height:100%;background:#fff;overflow:hidden;position:relative}
+
+/* Modern template mini */
+.mini-modern{display:flex;height:100%}
+.mini-modern .side{width:35%;padding:12px 8px;display:flex;flex-direction:column;gap:5px}
+.mini-modern .main{flex:1;padding:12px 8px;display:flex;flex-direction:column;gap:4px}
+.mini-line{height:5px;border-radius:3px;background:#e2e8f0}
+.mini-line.dark{background:#cbd5e1}
+.mini-line.primary{background:var(--c,#6c63ff);opacity:.8}
+.mini-circle{width:36px;height:36px;border-radius:50%;background:rgba(255,255,255,.3);margin:0 auto 6px}
+.mini-h{height:8px;border-radius:2px;margin-bottom:4px}
+.mini-sep{height:1px;background:rgba(255,255,255,.25);margin:6px 0}
+
+/* ── Card info ── */
+.tpl-info{padding:16px 20px}
+.tpl-name{font-size:15px;font-weight:700;margin-bottom:4px}
+.tpl-desc{font-size:12px;color:var(--text2);line-height:1.5;margin-bottom:12px}
+.tpl-tags{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:14px}
+.tag{font-size:11px;padding:3px 10px;border-radius:999px;background:rgba(108,99,255,.12);color:var(--primary);border:1px solid rgba(108,99,255,.2)}
+.tpl-actions{display:flex;gap:8px}
+.tpl-actions .btn{flex:1;padding:8px 12px;font-size:12px}
+
+/* ── Color picker in card ── */
+.card-colors{display:flex;gap:6px;margin-bottom:12px}
+.c-dot{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:transform .15s}
+.c-dot:hover{transform:scale(1.2)}
+.c-dot.active{border-color:#fff}
+
+/* ── Selected template banner ── */
+.select-banner{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,var(--primary),#9333ea);color:#fff;padding:14px 32px;display:flex;align-items:center;justify-content:space-between;transform:translateY(100%);transition:transform .4s cubic-bezier(.16,1,.3,1);z-index:100;box-shadow:0 -8px 32px rgba(108,99,255,.4)}
+.select-banner.show{transform:translateY(0)}
+.banner-text{font-size:14px;font-weight:600}
+.banner-sub{font-size:12px;opacity:.8;margin-top:2px}
+.banner-btn{padding:10px 24px;background:#fff;color:var(--primary);border:none;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;font-family:inherit;transition:transform .15s}
+.banner-btn:hover{transform:scale(1.04)}
+
+/* ── Scrollbar ── */
+::-webkit-scrollbar{width:5px}
+::-webkit-scrollbar-thumb{background:var(--border);border-radius:3px}
+
+/* ════════════════════════════
+   MOBILE RESPONSIVE
+════════════════════════════ */
+
+/* Tablet ≤ 900px */
+@media (max-width: 900px) {
+  .topbar { padding: 0 20px; }
+  .grid { padding: 0 20px 60px; gap: 18px; }
+  .hero { padding: 40px 20px 28px; }
+  .filter-bar { padding: 0 20px 24px; }
+}
+
+/* Mobile ≤ 640px */
+@media (max-width: 640px) {
+  .topbar { padding: 0 14px; height: 54px; }
+  .logo-tag { display: none; }
+  .logo-name { font-size: 16px !important; }
+  .topbar .btn-outline { padding: 7px 11px; font-size: 12px; }
+
+  .hero { padding: 28px 14px 20px; }
+  .hero h1 { font-size: 26px; }
+  .hero p { font-size: 13px; }
+
+  .filter-bar { padding: 0 14px 18px; gap: 6px; }
+  .filter-btn { padding: 6px 13px; font-size: 12px; }
+
+  .grid {
+    grid-template-columns: 1fr;
+    padding: 0 14px 80px;
+    gap: 16px;
+  }
+
+  .tpl-preview { height: 220px; }
+
+  .tpl-info { padding: 14px 16px; }
+  .tpl-name { font-size: 14px; }
+  .tpl-desc { font-size: 11.5px; }
+
+  .tpl-actions { flex-direction: column; gap: 6px; }
+  .tpl-actions .btn { padding: 9px 10px; font-size: 12px; }
+
+  .select-banner { padding: 12px 16px; flex-direction: column; gap: 10px; align-items: flex-start; }
+  .banner-btn { width: 100%; text-align: center; padding: 11px; }
+}
+
+/* Small phones ≤ 400px */
+@media (max-width: 400px) {
+  .hero h1 { font-size: 22px; }
+  .filter-btn { padding: 5px 10px; font-size: 11px; }
+  .grid { grid-template-columns: 1fr; padding: 0 10px 80px; }
+}
+</style>
+</head>
+<body>
+
+<!-- Topbar -->
+<div class="topbar">
+  <a class="logo" href="/app/index.html">
+    <svg width="36" height="36" viewBox="0 0 36 36" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="ng3" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#7c3aed"/>
+          <stop offset="0.5" stop-color="#9333ea"/>
+          <stop offset="1" stop-color="#06b6d4"/>
+        </linearGradient>
+        <linearGradient id="ng3b" x1="0" y1="0" x2="36" y2="36" gradientUnits="userSpaceOnUse">
+          <stop stop-color="#f0abfc" stop-opacity="0.9"/>
+          <stop offset="1" stop-color="#a5f3fc" stop-opacity="0.9"/>
+        </linearGradient>
+      </defs>
+      <rect width="36" height="36" rx="10" fill="url(#ng3)"/>
+      <rect x="9" y="9" width="18" height="3" rx="1.5" fill="url(#ng3b)"/>
+      <rect x="9" y="15" width="12" height="2.5" rx="1.25" fill="white" opacity="0.65"/>
+      <rect x="9" y="21" width="15" height="2.5" rx="1.25" fill="white" opacity="0.65"/>
+      <circle cx="28" cy="8" r="4.5" fill="#f59e0b"/>
+      <circle cx="28" cy="8" r="2.5" fill="#fde68a"/>
+    </svg>
+    <div class="logo-wordmark">
+      <span class="logo-name">NexaCV</span>
+      <span class="logo-tag">AI Resume Builder</span>
+    </div>
+  </a>
+  <div style="display:flex;gap:10px">
+    <button class="btn btn-outline" onclick="window.location.href='/app/index.html'">← Back to Builder</button>
+  </div>
+</div>
+
+<!-- Hero -->
+<div class="hero">
+  <h1>Choose Your <span>Template</span></h1>
+  <p>Select a professional resume template, pick your accent color, and fill in your details. All templates are ATS-compatible and export to PDF.</p>
+</div>
+
+<!-- Filter -->
+<div class="filter-bar">
+  <button class="filter-btn active" onclick="filterCards('all',this)">All Templates</button>
+  <button class="filter-btn" onclick="filterCards('professional',this)">Professional</button>
+  <button class="filter-btn" onclick="filterCards('creative',this)">Creative</button>
+  <button class="filter-btn" onclick="filterCards('minimal',this)">Minimal</button>
+  <button class="filter-btn" onclick="filterCards('two-column',this)">Two Column</button>
+</div>
+
+<!-- Grid -->
+<div class="grid" id="template-grid"></div>
+
+<!-- Selected banner -->
+<div class="select-banner" id="banner">
+  <div>
+    <div class="banner-text" id="banner-text">Modern Sidebar selected</div>
+    <div class="banner-sub">Click "Use Template" to start building →</div>
+  </div>
+  <button class="banner-btn" onclick="goToBuilder()">Use This Template →</button>
+</div>
+
+<script>
+// ══════════════════════════════════════════════════
+//  Template definitions
+// ══════════════════════════════════════════════════
+const TEMPLATES = [
+  {
+    id: 'modern',
+    name: 'Modern Sidebar',
+    desc: 'Two-column layout with a bold colored sidebar. Great for tech and design roles.',
+    tags: ['Two Column', 'Professional', 'ATS-Friendly'],
+    category: ['professional','two-column'],
+    colors: ['#6c63ff','#2563eb','#10b981','#ef4444','#f59e0b'],
+    defaultColor: '#6c63ff',
+    preview: 'modern',
+  },
+  {
+    id: 'classic',
+    name: 'Classic Professional',
+    desc: 'Traditional single-column serif layout. Timeless and trusted by top recruiters.',
+    tags: ['Single Column', 'Professional', 'ATS-Friendly'],
+    category: ['professional','minimal'],
+    colors: ['#1e293b','#2563eb','#7c3aed','#dc2626','#0f766e'],
+    defaultColor: '#1e293b',
+    preview: 'classic',
+  },
+  {
+    id: 'minimal',
+    name: 'Minimal Clean',
+    desc: 'Ultra-clean Helvetica design with pill-shaped skill tags. Perfect for any industry.',
+    tags: ['Minimal', 'Modern', 'ATS-Friendly'],
+    category: ['minimal','professional'],
+    colors: ['#6c63ff','#2563eb','#059669','#dc2626','#d97706'],
+    defaultColor: '#6c63ff',
+    preview: 'minimal',
+  },
+  {
+    id: 'creative',
+    name: 'Creative Bold',
+    desc: 'Eye-catching header with a strong accent bar. Best for designers and marketers.',
+    tags: ['Creative', 'Bold', 'Two Column'],
+    category: ['creative','two-column'],
+    colors: ['#7c3aed','#db2777','#0891b2','#16a34a','#ea580c'],
+    defaultColor: '#7c3aed',
+    preview: 'creative',
+  },
+  {
+    id: 'executive',
+    name: 'Executive',
+    desc: 'Elegant two-line header with subtle borders. Ideal for senior roles and management.',
+    tags: ['Professional', 'Elegant', 'Single Column'],
+    category: ['professional'],
+    colors: ['#1e3a5f','#1e293b','#374151','#7c3aed','#065f46'],
+    defaultColor: '#1e3a5f',
+    preview: 'executive',
+  },
+  {
+    id: 'tech',
+    name: 'Tech Dark',
+    desc: 'Dark background with neon accents. Made for software engineers and developers.',
+    tags: ['Creative', 'Dark', 'Two Column'],
+    category: ['creative','two-column'],
+    colors: ['#6c63ff','#00d4ff','#10b981','#f59e0b','#ef4444'],
+    defaultColor: '#6c63ff',
+    preview: 'tech',
+  },
+  {
+    id: 'elegant',
+    name: 'Elegant Serif',
+    desc: 'Sophisticated serif typography with decorative section dividers.',
+    tags: ['Elegant', 'Minimal', 'Single Column'],
+    category: ['minimal','professional'],
+    colors: ['#92400e','#1e3a5f','#4c1d95','#065f46','#1f2937'],
+    defaultColor: '#92400e',
+    preview: 'elegant',
+  },
+  {
+    id: 'compact',
+    name: 'Compact Infographic',
+    desc: 'Sidebar with skill progress bars and icon-based contact info. Dense and impactful.',
+    tags: ['Two Column', 'Creative', 'Infographic'],
+    category: ['creative','two-column'],
+    colors: ['#0f766e','#1d4ed8','#7c3aed','#b45309','#be123c'],
+    defaultColor: '#0f766e',
+    preview: 'compact',
+  },
+];
+
+// Selected state
+let selectedId    = localStorage.getItem('selectedTemplate') || 'modern';
+let selectedColor = localStorage.getItem('selectedColor')    || '#6c63ff';
+
+// ══════════════════════════════════════════════════
+//  Render cards
+// ══════════════════════════════════════════════════
+function renderGrid(filter='all') {
+  const grid = document.getElementById('template-grid');
+  grid.innerHTML = '';
+  TEMPLATES
+    .filter(t => filter === 'all' || t.category.includes(filter))
+    .forEach(renderCard);
+}
+
+function renderCard(t) {
+  const grid  = document.getElementById('template-grid');
+  const card  = document.createElement('div');
+  card.className = 'tpl-card' + (t.id === selectedId ? ' selected' : '');
+  card.id = 'card-' + t.id;
+
+  const colorOpts = t.colors.map(c =>
+    `<div class="c-dot${c===t.defaultColor?' active':''}" style="background:${c}" 
+     title="${c}" onclick="pickColor('${t.id}','${c}',this,event)"></div>`
+  ).join('');
+
+  const tagHtml = t.tags.map(g => `<span class="tag">${g}</span>`).join('');
+
+  card.innerHTML = `
+    <div class="selected-badge">✓ Selected</div>
+    <div class="tpl-preview">
+      <div class="preview-overlay"></div>
+      ${buildMiniPreview(t)}
+    </div>
+    <div class="tpl-info">
+      <div class="tpl-name">${t.name}</div>
+      <div class="tpl-desc">${t.desc}</div>
+      <div class="tpl-tags">${tagHtml}</div>
+      <div class="card-colors">${colorOpts}</div>
+      <div class="tpl-actions">
+        <button class="btn btn-outline" onclick="previewFull('${t.id}',event)">👁 Preview</button>
+        <button class="btn btn-primary" onclick="selectTemplate('${t.id}',event)">Use Template</button>
+      </div>
+    </div>`;
+
+  grid.appendChild(card);
+}
+
+// ══════════════════════════════════════════════════
+//  CSS-drawn mini resume previews
+// ══════════════════════════════════════════════════
+function buildMiniPreview(t) {
+  const c = t.defaultColor;
+  const previews = {
+    modern: `
+      <div style="display:flex;height:300px;font-size:0">
+        <div style="width:36%;background:${c};padding:16px 10px">
+          <div style="width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.25);margin:0 auto 8px"></div>
+          <div style="height:7px;background:rgba(255,255,255,.8);border-radius:3px;margin-bottom:4px;width:70%;margin-left:auto;margin-right:auto"></div>
+          <div style="height:4px;background:rgba(255,255,255,.4);border-radius:2px;width:55%;margin:0 auto 14px"></div>
+          ${miniLines(5,'rgba(255,255,255,.3)',4,2)}
+          <div style="height:1px;background:rgba(255,255,255,.2);margin:8px 0"></div>
+          ${miniLines(6,'rgba(255,255,255,.35)',5,2.5)}
+        </div>
+        <div style="flex:1;padding:16px 12px;background:#fff">
+          <div style="height:6px;background:#e2e8f0;border-radius:2px;margin-bottom:4px;width:80%"></div>
+          <div style="height:3px;background:${c};border-radius:2px;width:40%;margin-bottom:12px;opacity:.7"></div>
+          ${miniLines(4,'#e2e8f0',5,3)}
+          <div style="height:1px;background:#f0f0f0;margin:10px 0"></div>
+          ${miniLines(3,'#e2e8f0',4,3)}
+          <div style="height:1px;background:#f0f0f0;margin:10px 0"></div>
+          ${miniLines(5,'#e2e8f0',4,3)}
+        </div>
+      </div>`,
+    classic: `
+      <div style="height:300px;padding:20px;background:#fff">
+        <div style="text-align:center;border-bottom:2px solid #1e293b;padding-bottom:10px;margin-bottom:12px">
+          <div style="height:10px;background:#1e293b;border-radius:2px;width:50%;margin:0 auto 6px"></div>
+          <div style="height:4px;background:#94a3b8;border-radius:2px;width:70%;margin:0 auto"></div>
+        </div>
+        ${miniSection('#1e293b')}
+        ${miniLines(4,'#e2e8f0',5,3)}
+        ${miniSection('#1e293b')}
+        ${miniLines(3,'#e2e8f0',4,3)}
+        ${miniSection('#1e293b')}
+        ${miniLines(3,'#e2e8f0',5,3)}
+      </div>`,
+    minimal: `
+      <div style="height:300px;padding:20px;background:#fafafa">
+        <div style="height:4px;background:${c};border-radius:2px;margin-bottom:14px"></div>
+        <div style="display:flex;justify-content:space-between;margin-bottom:14px">
+          <div>
+            <div style="height:10px;background:#1e293b;border-radius:2px;width:100px;margin-bottom:4px"></div>
+            <div style="height:4px;background:${c};border-radius:2px;width:60px;opacity:.7"></div>
+          </div>
+          <div style="text-align:right">${miniLines(3,'#cbd5e1',50,2.5)}</div>
+        </div>
+        ${miniLabel(c)}${miniLines(3,'#e2e8f0',5,3)}
+        ${miniLabel(c)}${miniLines(2,'#e2e8f0',4,3)}
+        <div style="display:flex;flex-wrap:wrap;gap:4px;margin-top:8px">
+          ${miniPills(c,6)}
+        </div>
+      </div>`,
+    creative: `
+      <div style="height:300px;background:#fff;overflow:hidden">
+        <div style="background:${c};height:80px;display:flex;align-items:center;padding:0 16px;gap:12px">
+          <div style="width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.25);flex-shrink:0"></div>
+          <div>
+            <div style="height:9px;background:#fff;border-radius:2px;width:90px;margin-bottom:4px"></div>
+            <div style="height:4px;background:rgba(255,255,255,.6);border-radius:2px;width:60px"></div>
+          </div>
+        </div>
+        <div style="display:flex;height:calc(100% - 80px)">
+          <div style="width:38%;padding:10px 8px;background:#f8fafc">
+            ${miniLines(4,'#cbd5e1',4,2.5)}
+            <div style="height:1px;background:#e2e8f0;margin:8px 0"></div>
+            ${miniLines(5,'#e2e8f0',4,2.5)}
+          </div>
+          <div style="flex:1;padding:10px 10px">
+            ${miniLines(5,'#e2e8f0',5,3)}
+            <div style="height:1px;background:#f0f0f0;margin:8px 0"></div>
+            ${miniLines(4,'#e2e8f0',4,3)}
+          </div>
+        </div>
+      </div>`,
+    executive: `
+      <div style="height:300px;padding:20px;background:#fff">
+        <div style="border-bottom:3px double ${c};border-top:1px solid ${c};padding:10px 0;text-align:center;margin-bottom:14px">
+          <div style="height:11px;background:${c};border-radius:2px;width:55%;margin:0 auto 5px"></div>
+          <div style="height:4px;background:#94a3b8;border-radius:2px;width:40%;margin:0 auto 4px"></div>
+          <div style="height:3px;background:#cbd5e1;border-radius:2px;width:65%;margin:0 auto"></div>
+        </div>
+        ${miniSection(c)}
+        ${miniLines(3,'#e2e8f0',5,3)}
+        ${miniSection(c)}
+        ${miniLines(4,'#e2e8f0',4,3)}
+      </div>`,
+    tech: `
+      <div style="display:flex;height:300px;background:#0f1117">
+        <div style="width:36%;padding:14px 10px;background:#1a1d2e">
+          <div style="width:40px;height:40px;border-radius:8px;background:${c};opacity:.8;margin:0 auto 8px"></div>
+          <div style="height:6px;background:rgba(255,255,255,.7);border-radius:3px;width:70%;margin:0 auto 4px"></div>
+          <div style="height:3px;background:${c};border-radius:2px;width:50%;margin:0 auto 14px"></div>
+          ${miniLines(5,'rgba(255,255,255,.15)',4,2)}
+          <div style="height:1px;background:rgba(255,255,255,.1);margin:8px 0"></div>
+          ${miniLines(4,'rgba(255,255,255,.2)',4,2.5)}
+        </div>
+        <div style="flex:1;padding:14px 12px">
+          <div style="height:5px;background:${c};border-radius:2px;width:50%;margin-bottom:3px"></div>
+          <div style="height:3px;background:rgba(255,255,255,.15);border-radius:2px;width:80%;margin-bottom:10px"></div>
+          ${miniLines(4,'rgba(255,255,255,.12)',5,3)}
+          <div style="height:1px;background:rgba(255,255,255,.06);margin:8px 0"></div>
+          ${miniLines(4,'rgba(255,255,255,.12)',4,3)}
+        </div>
+      </div>`,
+    elegant: `
+      <div style="height:300px;padding:20px;background:#fffbf5">
+        <div style="text-align:center;margin-bottom:14px">
+          <div style="height:3px;background:${c};width:40px;margin:0 auto 8px"></div>
+          <div style="height:10px;background:#1c1c1c;border-radius:1px;width:55%;margin:0 auto 5px;font-family:Georgia"></div>
+          <div style="height:4px;background:#a8a8a8;border-radius:1px;width:35%;margin:0 auto 4px"></div>
+          <div style="height:3px;background:${c};width:40px;margin:4px auto 0"></div>
+        </div>
+        ${miniSection(c,true)}
+        ${miniLines(4,'#e8e0d8',5,3)}
+        ${miniSection(c,true)}
+        ${miniLines(3,'#e8e0d8',4,3)}
+        ${miniSection(c,true)}
+        ${miniLines(3,'#e8e0d8',4,3)}
+      </div>`,
+    compact: `
+      <div style="display:flex;height:300px;background:#fff">
+        <div style="width:38%;padding:12px 8px;background:${c}">
+          <div style="width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.25);margin:0 auto 8px;border:2px solid rgba(255,255,255,.5)"></div>
+          <div style="height:6px;background:rgba(255,255,255,.85);border-radius:3px;margin-bottom:4px;width:75%;margin-left:auto;margin-right:auto"></div>
+          <div style="height:3px;background:rgba(255,255,255,.5);border-radius:2px;width:55%;margin:0 auto 12px"></div>
+          ${miniProgressBars(c,5)}
+        </div>
+        <div style="flex:1;padding:12px 10px;background:#fff">
+          <div style="height:5px;background:#e2e8f0;border-radius:2px;width:80%;margin-bottom:3px"></div>
+          <div style="height:2px;background:${c};opacity:.5;border-radius:2px;width:40%;margin-bottom:10px"></div>
+          ${miniLines(5,'#e8ecf0',5,3)}
+          <div style="height:1px;background:#f0f4f8;margin:8px 0"></div>
+          ${miniLines(4,'#e8ecf0',4,3)}
+        </div>
+      </div>`,
+  };
+  return `<div class="mini-resume">${previews[t.preview] || previews.modern}</div>`;
+}
+
+function miniLines(n, color, maxW, h) {
+  return Array.from({length:n}, (_,i) =>
+    `<div style="height:${h}px;background:${color};border-radius:2px;margin-bottom:4px;width:${55+Math.random()*40}%"></div>`
+  ).join('');
+}
+function miniSection(c, elegant=false) {
+  return `<div style="height:${elegant?4:5}px;background:${c};border-radius:2px;margin:8px 0 6px;width:${elegant?30:40}%;opacity:${elegant?.6:.9}"></div>`;
+}
+function miniLabel(c) {
+  return `<div style="height:4px;background:${c};border-radius:2px;width:30%;margin:8px 0 6px;opacity:.7;letter-spacing:2px"></div>`;
+}
+function miniPills(c, n) {
+  const ws = [40,55,45,60,38,50];
+  return Array.from({length:n}, (_,i) =>
+    `<div style="height:14px;background:${c}22;border:1px solid ${c}44;border-radius:999px;width:${ws[i]}px"></div>`
+  ).join('');
+}
+function miniProgressBars(c, n) {
+  const pcts = [85,70,90,65,80];
+  return Array.from({length:n}, (_,i) => `
+    <div style="margin-bottom:8px">
+      <div style="height:3px;background:rgba(255,255,255,.2);border-radius:2px;margin-bottom:2px;width:75%;margin-left:auto;margin-right:auto"></div>
+      <div style="height:3px;background:rgba(255,255,255,.8);border-radius:2px;width:${pcts[i]*0.75}%;margin-left:12.5%"></div>
+    </div>`
+  ).join('');
+}
+
+// ══════════════════════════════════════════════════
+//  Interactions
+// ══════════════════════════════════════════════════
+function filterCards(cat, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderGrid(cat);
+  // Re-mark selected
+  const card = document.getElementById('card-' + selectedId);
+  if (card) card.classList.add('selected');
+}
+
+function pickColor(tplId, color, dot, event) {
+  event.stopPropagation();
+  // Update dot active state in this card only
+  dot.closest('.card-colors').querySelectorAll('.c-dot').forEach(d => d.classList.remove('active'));
+  dot.classList.add('active');
+  // Update mini preview color (regenerate)
+  const t = TEMPLATES.find(t => t.id === tplId);
+  if (t) {
+    t.defaultColor = color;
+    const preview = dot.closest('.tpl-card').querySelector('.mini-resume');
+    if (preview) preview.outerHTML = buildMiniPreview({...t, defaultColor: color});
+  }
+  if (selectedId === tplId) {
+    selectedColor = color;
+    localStorage.setItem('selectedColor', color);
+  }
+}
+
+function selectTemplate(id, event) {
+  event && event.stopPropagation();
+  selectedId = id;
+  const t = TEMPLATES.find(t => t.id === id);
+  // find selected color from active dot
+  const card = document.getElementById('card-' + id);
+  if (card) {
+    const activeDot = card.querySelector('.c-dot.active');
+    selectedColor = activeDot ? activeDot.style.background : (t?.defaultColor || '#6c63ff');
+  }
+  localStorage.setItem('selectedTemplate', id);
+  localStorage.setItem('selectedColor', selectedColor);
+
+  document.querySelectorAll('.tpl-card').forEach(c => c.classList.remove('selected'));
+  if (card) card.classList.add('selected');
+
+  const banner = document.getElementById('banner');
+  banner.classList.add('show');
+  document.getElementById('banner-text').textContent = `${t?.name} selected`;
+}
+
+function previewFull(id, event) {
+  event && event.stopPropagation();
+  const t = TEMPLATES.find(t => t.id === id);
+  // Open a full page preview
+  const w = window.open('', '_blank', 'width=800,height=900');
+  w.document.write(`<!DOCTYPE html><html><head><title>Preview: ${t?.name}</title>
+    <style>body{margin:0;background:#f0f4ff;display:flex;flex-direction:column;align-items:center;padding:20px;font-family:Inter,sans-serif}
+    .bar{background:#1a1d2e;color:#fff;padding:12px 24px;border-radius:8px;margin-bottom:16px;font-size:13px}
+    iframe{width:794px;height:1123px;border:none;border-radius:8px;box-shadow:0 20px 60px rgba(0,0,0,.2)}</style></head>
+    <body><div class="bar"> ${t?.name} — Sample Preview</div>
+    <iframe src="about:blank" id="pf"></iframe>
+    <script>
+      fetch('/api/resume/generate',{
+        method:'POST',headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({full_name:'Alex Johnson',email:'alex@email.com',phone:'+1 555 100 2000',
+          location:'San Francisco, CA',linkedin:'linkedin.com/in/alex',github:'github.com/alex',
+          summary:'Senior Software Engineer with 5+ years building scalable web applications. Passionate about clean code and great user experiences.',
+          experience:[{company:'Google',position:'Senior Software Engineer',location:'Mountain View, CA',start_date:'Jan 2022',end_date:'Present',is_current:true,description:'Led development of core search features serving 1B+ users daily.',achievements:['Improved page load speed by 40%','Led team of 8 engineers','Shipped 3 major product launches']}],
+          education:[{institution:'MIT',degree:'Bachelor of Science',field_of_study:'Computer Science',start_date:'2015',end_date:'2019',gpa:'3.9'}],
+          skills:['Python','React','TypeScript','Node.js','AWS','Docker','PostgreSQL','GraphQL'],
+          projects:[{name:'OpenSearch Tool',description:'Open-source CLI for querying databases.',technologies:['Python','Click','SQLAlchemy'],link:'github.com/alex/opensearch'}],
+          certifications:[{name:'AWS Solutions Architect',issuer:'Amazon',date:'2023'}],
+          languages:['English (Native)','Spanish (B2)'],
+          template:'${id}',primary_color:'${t?.defaultColor||'#6c63ff'}'}),
+      }).then(r=>r.json()).then(d=>{
+        const doc=document.getElementById('pf').contentDocument;
+        doc.open();doc.write(d.html);doc.close();
+      }).catch(()=>{
+        document.getElementById('pf').srcdoc='<style>body{display:flex;align-items:center;justify-content:center;height:100%;font-family:sans-serif;color:#64748b;text-align:center;padding:40px}</style><p>Start the backend to see full preview.<br><code>uvicorn app.main:app --reload</code></p>';
+      });
+    <\/script></body></html>`);
+  w.document.close();
+}
+
+function goToBuilder() {
+  window.location.href = '/app/index.html';
+}
+
+// ══════════════════════════════════════════════════
+//  Init
+// ══════════════════════════════════════════════════
+renderGrid('all');
+// Show banner if already selected
+if (selectedId) {
+  const t = TEMPLATES.find(t => t.id === selectedId);
+  if (t) {
+    setTimeout(() => {
+      const card = document.getElementById('card-' + selectedId);
+      if (card) card.classList.add('selected');
+      const banner = document.getElementById('banner');
+      document.getElementById('banner-text').textContent = `${t.name} selected`;
+      banner.classList.add('show');
+    }, 300);
+  }
+}
+</script>
+</body>
+</html>
