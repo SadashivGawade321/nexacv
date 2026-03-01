@@ -4,7 +4,10 @@ from app.services.template_renderer import render_template
 
 def generate_pdf(resume_data: ResumeData) -> bytes:
     """Generate a PDF from resume data using xhtml2pdf (no system deps required)."""
-    from xhtml2pdf import pisa
+    try:
+        from xhtml2pdf import pisa
+    except ImportError:
+        raise RuntimeError("PDF generation not available in this environment. Use the Download PDF button in the browser instead.")
     html_content = render_template(resume_data)
     # Add A4 page style wrapper
     full_html = f"""<!DOCTYPE html><html><head><meta charset="UTF-8"/>
